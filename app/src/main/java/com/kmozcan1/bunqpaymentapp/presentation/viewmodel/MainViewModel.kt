@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.kmozcan1.bunqpaymentapp.domain.model.Event
 import com.kmozcan1.bunqpaymentapp.domain.model.UseCaseResult
+import com.kmozcan1.bunqpaymentapp.domain.usecase.GetBunqApiContextUseCase
 import com.kmozcan1.bunqpaymentapp.domain.usecase.ObserveInternetConnectivityUseCase
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.MainViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val observeInternetConnectivityUseCase: ObserveInternetConnectivityUseCase
+    private val observeInternetConnectivityUseCase: ObserveInternetConnectivityUseCase,
+    private val getBunqApiContextUseCase: GetBunqApiContextUseCase
     ) : BaseViewModel<MainViewState>() {
 
     // LiveData for navigation
@@ -34,7 +36,7 @@ class MainViewModel @Inject constructor(
     val internetConnectionLiveData: MutableLiveData<Boolean>
         get() = _internetConnectionLiveData
     private val _internetConnectionLiveData = MutableLiveData<Boolean>()
-    internal fun setInternetConnectionLiveData(value: Boolean) {
+    private fun setInternetConnectionLiveData(value: Boolean) {
         _internetConnectionLiveData.postValue(value)
     }
 
@@ -45,6 +47,16 @@ class MainViewModel @Inject constructor(
                 if (result is UseCaseResult.Success) {
                     setInternetConnectionLiveData(result.data)
                 }
+            }
+        }
+    }
+
+    /** Retrieves the bunq ApiContext using the GetBunqApiContextUseCase Interactor */
+    fun getBunqApiContext() {
+        viewModelScope.launch {
+            val result = getBunqApiContextUseCase(Unit)
+            if (result is UseCaseResult.Success) {
+                setViewState(MainViewState.BunqApiContext(result.data))
             }
         }
     }

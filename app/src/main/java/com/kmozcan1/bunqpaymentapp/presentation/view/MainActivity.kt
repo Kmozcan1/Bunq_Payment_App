@@ -1,6 +1,7 @@
 package com.kmozcan1.bunqpaymentapp.presentation.view
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,14 +14,14 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import com.bunq.sdk.context.ApiContext
 import com.google.android.material.appbar.MaterialToolbar
 import com.kmozcan1.bunqpaymentapp.R
+import com.kmozcan1.bunqpaymentapp.databinding.ActivityMainBinding
 import com.kmozcan1.bunqpaymentapp.domain.model.Event
 import com.kmozcan1.bunqpaymentapp.presentation.viewmodel.MainViewModel
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.MainViewState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
 
 /**
  * Created by Kadir Mert Özcan on 27-Nov-21.
@@ -28,11 +29,15 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     var isConnectedToInternet: Boolean = false
         private set
 
-
     val viewModel: MainViewModel by viewModels()
+
+    var bunqApiContext: ApiContext? = null
+        private set
 
     private val navHostFragment : NavHostFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -47,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     val actionBar: MaterialToolbar by lazy {
-        findViewById(R.id.topAppBar)
+        findViewById(R.id.top_app_bar)
     }
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
@@ -59,13 +64,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setViews()
         viewModel.observeInternetConnection()
+        viewModel.getBunqApiContext()
         viewModel.internetConnectionLiveData.observe(this, observeInternetConnection())
         viewModel.fragmentNavigationEvent.observe(this, observeFragmentNavigation())
+        viewModel.viewState.observe(this, observeViewState())
     }
 
-    // Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
-    // While pretty straight-forward for this app, this method allows adding custom
-    // stuff between navigation (like checking for permission) and keeps it all in one place
+    /** Observes MainViewState */
+    private fun observeViewState() = Observer<MainViewState> { viewState ->
+        when (viewState) {
+            is MainViewState.BunqApiContext -> {
+                bunqApiContext = viewState.bunqApiContext
+                binding.initializingLayout.visibility = View.GONE
+            }
+            is MainViewState.Error -> TODO()
+            MainViewState.Loading -> TODO()
+        }
+    }
+
+    /** Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
+     * While pretty straight-forward for this app, this method allows adding custom
+     * stuff between navigation (like checking for permission) and keeps it all in one place
+     */
     private fun observeFragmentNavigation() = Observer<Event<NavDirections>> { navEvent ->
         navEvent.getContentIfNotHandled()?.let { navDirections ->
             when(navDirections.actionId) {
@@ -74,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Observes the internet connectivity
+    /** Observes the internet connectivity */
     private fun observeInternetConnection() = Observer<Boolean> { connection ->
         isConnectedToInternet = connection
         val currentFragment = getActiveFragment()
@@ -89,16 +109,22 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // View related stuff goes here
+    /** View related stuff goes here */
     private fun setViews() {
-        setContentView(R.layout.activity_main)
+        // view binding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         actionBar.setupWithNavController(navController, appBarConfiguration)
     }
 
-    // Returns the fragment that is currently on the screen
+    /** Returns the fragment that is currently on the screen */
     private fun getActiveFragment(): Fragment? {
-        return supportFragmentManager.fragments
-            .first()?.childFragmentManager?.fragments?.get(0)
+        return if (supportFragmentManager.fragments.size == 0) {
+            null
+        } else {
+            supportFragmentManager.fragments
+                .first()?.childFragmentManager?.fragments?.get(0)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

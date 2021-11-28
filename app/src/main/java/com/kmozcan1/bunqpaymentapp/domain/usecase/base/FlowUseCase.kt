@@ -10,7 +10,7 @@ import timber.log.Timber
 
 
 /**
- * Created by Kadir Mert Özcan on 15-Jun-21.
+ * Created by Kadir Mert Özcan on 28-Nov-21.
  *
  * Base class for use cases that utilize Flow
  * https://github.com/google/iosched/blob/main/shared/src/main/java/com/google/samples/apps/iosched/shared/domain/FlowUseCase.kt
