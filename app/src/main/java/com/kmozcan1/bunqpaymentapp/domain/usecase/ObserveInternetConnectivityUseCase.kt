@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Created by Kadir Mert Özcan on 11/28/2021.
+ * Created by Kadir Mert Özcan on 28-Nov-21.
  */
 class ObserveInternetConnectivityUseCase @Inject constructor(
     private val internetConnectivityHelper: InternetConnectivityHelper,
