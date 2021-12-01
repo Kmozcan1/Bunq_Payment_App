@@ -82,4 +82,8 @@ dependencies {
 
     // xerces for BunqAqi DatatypeFactoryImpl error
     implementation group: 'xerces', name: 'xercesImpl', version: '2.12.1'
+
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }

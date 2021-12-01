@@ -1,7 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation.view
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -20,7 +19,6 @@ import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.ActivityMainBinding
 import com.kmozcan1.bunqpaymentapp.domain.model.Event
 import com.kmozcan1.bunqpaymentapp.presentation.viewmodel.MainViewModel
-import com.kmozcan1.bunqpaymentapp.presentation.viewstate.MainViewState
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -64,22 +62,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setViews()
         viewModel.observeInternetConnection()
-        viewModel.getBunqApiContext()
         viewModel.internetConnectionLiveData.observe(this, observeInternetConnection())
         viewModel.fragmentNavigationEvent.observe(this, observeFragmentNavigation())
-        viewModel.viewState.observe(this, observeViewState())
-    }
-
-    /** Observes MainViewState */
-    private fun observeViewState() = Observer<MainViewState> { viewState ->
-        when (viewState) {
-            is MainViewState.BunqApiContext -> {
-                bunqApiContext = viewState.bunqApiContext
-                binding.initializingLayout.visibility = View.GONE
-            }
-            is MainViewState.Error -> TODO()
-            MainViewState.Loading -> TODO()
-        }
     }
 
     /** Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
@@ -128,7 +112,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
