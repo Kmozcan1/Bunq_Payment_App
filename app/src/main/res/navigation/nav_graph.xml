@@ -9,6 +9,6 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.kmozcan1.bunqpaymentapp.presentation.view.HomeFragment"
-        android:label="@string/payments"
+        android:label="home_fragment"
         tools:layout="@layout/home_fragment" />
 </navigation>

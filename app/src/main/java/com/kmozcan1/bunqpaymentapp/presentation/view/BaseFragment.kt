@@ -23,7 +23,7 @@ import androidx.navigation.ui.AppBarConfiguration
 abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass : ViewModel>
     : Fragment() {
 
-    val mainActivity by lazy {
+    private val mainActivity by lazy {
         activity as MainActivity
     }
 
@@ -39,21 +39,20 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
         activity as AppCompatActivity
     }
 
-    /** ViewDataBinding instance with the type parameter indicated by the child class */
+    // ViewDataBinding instance with the type parameter indicated by the child class
     lateinit var binding: DataBindingClass
         private set
 
-    /** ViewModel instance with the type parameter indicated by the child class */
     lateinit var viewModel: ViewModelClass
         private set
 
-    /** Layout res id for to inflate with data binding */
+    // Layout res id for to inflate with data binding
     abstract val layoutId: Int
 
-    /** Must be set for providing type safe view model */
+    // Must be set for providing type safe view model
     abstract val viewModelClass: Class<ViewModelClass>
 
-    /** Determines action bar visibility */
+    // Determines action bar visibility
     abstract val isActionBarVisible: Boolean
 
     override fun onCreateView(
@@ -82,17 +81,12 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
         mainActivity.finishAndRemoveTask()
     }
 
-    /** Called just before onCreateView is finished. Default implementation is empty */
+    // Called just before onCreateView is finished. Default implementation is empty
     open fun onViewBound() {}
 
-    /** Called just before onActivityCreated is finished */
+    // Called just before onActivityCreated is finished
     open fun observeLiveData() {}
 
-
-    /** Sets actionBar visibility */
-    protected fun setActionBarVisibility(isVisible: Boolean) {
-        mainActivity.actionBar.isVisible = isVisible
-    }
 
     /**
      * Inner class to be used by fragments for navigation purposes.
