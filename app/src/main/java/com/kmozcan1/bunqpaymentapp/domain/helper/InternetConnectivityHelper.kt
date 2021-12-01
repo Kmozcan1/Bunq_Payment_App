@@ -8,14 +8,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 /**
- * Created by Kadir Mert Özcan on 11/28/2021.
+ * Created by Kadir Mert Özcan on 28-Nov-21.
  */
 class InternetConnectivityHelper @Inject constructor(
     @ApplicationContext private val context: Context) {
