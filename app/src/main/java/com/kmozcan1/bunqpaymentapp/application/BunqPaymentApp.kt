@@ -7,4 +7,6 @@ import dagger.hilt.android.HiltAndroidApp
  * Created by Kadir Mert Özcan on 27-Nov-21.
  */
 @HiltAndroidApp
-class BunqPaymentApp : Application()
+class BunqPaymentApp : Application() {
+    var isApiContextInitialized = false
+}

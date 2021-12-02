@@ -73,7 +73,12 @@ class MainActivity : AppCompatActivity() {
     private fun observeFragmentNavigation() = Observer<Event<NavDirections>> { navEvent ->
         navEvent.getContentIfNotHandled()?.let { navDirections ->
             when(navDirections.actionId) {
-
+                R.id.action_homeFragment_to_paymentFragment -> {
+                    navController.navigate(navDirections)
+                }
+                R.id.action_paymentFragment_to_homeFragment -> {
+                    navController.navigate(navDirections)
+                }
             }
         }
     }

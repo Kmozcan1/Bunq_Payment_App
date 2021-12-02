@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.kmozcan1.bunqpaymentapp.domain.model.Event
 import com.kmozcan1.bunqpaymentapp.domain.model.UseCaseResult
-import com.kmozcan1.bunqpaymentapp.domain.usecase.InitializeBunqApiContextUseCase
 import com.kmozcan1.bunqpaymentapp.domain.usecase.ObserveInternetConnectivityUseCase
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.MainViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +17,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val observeInternetConnectivityUseCase: ObserveInternetConnectivityUseCase,
-    private val initializeBunqApiContextUseCase: InitializeBunqApiContextUseCase
+    private val observeInternetConnectivityUseCase: ObserveInternetConnectivityUseCase
     ) : BaseViewModel<MainViewState>() {
 
     // LiveData for navigation

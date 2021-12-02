@@ -1,5 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation.viewstate
 
+import androidx.paging.PagingData
 import com.bunq.sdk.model.generated.endpoint.Payment
 
 /**
@@ -7,5 +8,5 @@ import com.bunq.sdk.model.generated.endpoint.Payment
  */
 sealed class HomeViewState {
     object BunqApiContext : HomeViewState()
-    class PaymentList (val paymentList: List<Payment>) : HomeViewState()
+    class PaymentList (val pagingData: PagingData<Payment>) : HomeViewState()
 }
