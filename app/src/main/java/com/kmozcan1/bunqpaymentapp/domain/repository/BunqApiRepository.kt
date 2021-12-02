@@ -13,4 +13,5 @@ interface BunqApiRepository {
     fun initializeBunqApiContext()
     fun getPaymentsList(olderId: String?): Flow<UseCaseResult<BunqResponse<List<Payment>>>>
     fun submitPayment(email: String, amount: String, description: String) : Flow<UseCaseResult<Unit>>
+    fun getPayment(paymentId: Int) : Flow<UseCaseResult<Payment>>
 }

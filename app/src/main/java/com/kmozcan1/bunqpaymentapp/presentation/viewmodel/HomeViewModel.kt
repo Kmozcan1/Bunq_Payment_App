@@ -1,5 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -19,9 +20,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val getPaymentsListUseCase: GetPaymentsListUseCase,
     private val initializeBunqApiContextUseCase: InitializeBunqApiContextUseCase
 ) : BaseViewModel<HomeViewState>() {
+
+    companion object {
+        const val HAS_RETAINED_LIST_KEY = "hasRetainedList"
+    }
 
     /** Retrieves the bunq ApiContext using the GetBunqApiContextUseCase Interactor */
     fun getBunqApiContext() {
@@ -39,6 +45,7 @@ class HomeViewModel @Inject constructor(
      * Collect pagination the data and updates the ViewState
      * */
     fun getPaymentsList() {
+        setHasRetainedListState(false)
         val pager =  Pager(
             config = PagingConfig(initialLoadSize = 30, pageSize = 10, prefetchDistance = 10),
             pagingSourceFactory = {
@@ -53,5 +60,13 @@ class HomeViewModel @Inject constructor(
                 setViewState(HomeViewState.PaymentList(pagingData = it))
             }
         }
+    }
+
+    fun setHasRetainedListState(hasRetainedList: Boolean) {
+        savedStateHandle[HAS_RETAINED_LIST_KEY] = hasRetainedList
+    }
+
+    fun getHasRetainedListState(): Boolean? {
+        return savedStateHandle.get<Boolean>(HAS_RETAINED_LIST_KEY)
     }
 }

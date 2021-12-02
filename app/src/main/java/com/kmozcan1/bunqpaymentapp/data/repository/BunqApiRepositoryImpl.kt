@@ -71,13 +71,11 @@ class BunqApiRepositoryImpl @Inject constructor(
 
 
 
-    /** Retrieves the next (or first) page of the main account */
+    /** Retrieves the next (or the first) page of the main account */
     override fun getPaymentsList(
         olderId: String?
     ): Flow<UseCaseResult<BunqResponse<List<Payment>>>> {
         return flow {
-            emit(UseCaseResult.Loading)
-            var result: BunqResponse<List<Payment>>? = null
             try {
                 val mainAccountId = BunqContext.getUserContext().mainMonetaryAccountId
 
@@ -101,6 +99,7 @@ class BunqApiRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Submits a payment */
     override fun submitPayment(
         email: String, amount: String, description: String
     ): Flow<UseCaseResult<Unit>> {
@@ -126,6 +125,24 @@ class BunqApiRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Gets the payment with the id parameter */
+    override fun getPayment(paymentId: Int): Flow<UseCaseResult<Payment>> {
+        return flow {
+            emit(UseCaseResult.Loading)
+            try {
+                emit(UseCaseResult.Success(Payment.get(paymentId).value))
+            } catch (e: UncaughtExceptionError) {
+                Timber.e(e)
+                emit(UseCaseResult.Error(e))
+            } catch (e: Exception) {
+                Timber.e(e)
+                emit(UseCaseResult.Error(e))
+            }
+
+        }
+    }
+
+    /** Asks the sugar daddy for money */
     private fun askForMoneyFromSugarDaddy(amount: String) {
         try {
             RequestInquiry.create(

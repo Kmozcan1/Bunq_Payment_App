@@ -79,6 +79,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.action_paymentFragment_to_homeFragment -> {
                     navController.navigate(navDirections)
                 }
+                R.id.action_homeFragment_to_paymentDetailFragment -> {
+                    navController.navigate(navDirections)
+                }
             }
         }
     }

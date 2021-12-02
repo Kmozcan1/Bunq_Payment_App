@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_homeFragment_to_paymentFragment"
             app:destination="@id/paymentFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_paymentDetailFragment"
+            app:destination="@id/paymentDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/paymentFragment"
@@ -22,6 +25,14 @@
         <action
             android:id="@+id/action_paymentFragment_to_homeFragment"
             app:destination="@id/homeFragment"
-            app:popUpTo="@id/homeFragment" />
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/paymentDetailFragment"
+        android:name="com.kmozcan1.bunqpaymentapp.presentation.view.PaymentDetailFragment"
+        android:label="@string/payment_details" >
+        <argument android:name="paymentId"
+            app:argType="integer" />
     </fragment>
 </navigation>

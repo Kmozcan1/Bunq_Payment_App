@@ -47,14 +47,14 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
     private fun showPaymentResult(isSuccess: Boolean) {
         if (isSuccess) {
             binding.run {
-                paymentResultImageView.setBackgroundResource(R.drawable.ic_baseline_check_circle_24)
+                paymentResultImageView.setImageResource(R.drawable.ic_baseline_check_circle_24)
                 paymentResultTextView.text = getString(R.string.payment_successful)
                 retryPaymentButton.visibility = View.GONE
                 navigateToPaymentListButton.visibility = View.VISIBLE
             }
         } else {
             binding.run {
-                paymentResultImageView.setBackgroundResource(R.drawable.ic_baseline_error_24)
+                paymentResultImageView.setImageResource(R.drawable.ic_baseline_error_24)
                 paymentResultTextView.text = getString(R.string.payment_error)
                 navigateToPaymentListButton.visibility = View.GONE
                 retryPaymentButton.visibility = View.VISIBLE
