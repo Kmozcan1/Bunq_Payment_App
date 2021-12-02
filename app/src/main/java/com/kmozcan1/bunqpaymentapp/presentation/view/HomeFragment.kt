@@ -53,8 +53,12 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
                 displayPayments()
             }
             is HomeViewState.PaymentList -> {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    paymentListAdapter.submitData(lifecycle, viewState.pagingData)
+                viewModel.getHasRetainedListState()?.let {
+                    if (!it) {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            paymentListAdapter.submitData(lifecycle, viewState.pagingData)
+                        }
+                    }
                 }
             }
         }
@@ -64,7 +68,6 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
         // This prevents paging 3 from loading all items at once when recyclerview height is 0dp
         // I spent like 3 hours trying to figure this out
         binding.paymentListRecyclerView.setHasFixedSize(true)
-
         viewLifecycleOwner.lifecycleScope.launch {
             paymentListAdapter.addLoadStateListener { loadState ->
                 if ( loadState.prepend.endOfPaginationReached )
@@ -76,16 +79,19 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
                 }
             }
         }
-
         binding.paymentListRecyclerView.adapter = paymentListAdapter
     }
 
     private fun displayPayments() {
+        val hasRetained = viewModel.getHasRetainedListState()
+
         setInitializationLayoutVisibility(isVisible = false)
-        setActionBarVisibility(isVisible = true)
-        setProgressBarVisibility(isVisible = true)
-        //viewModel.getPaymentsList()
-        viewModel.getPaymentsList()
+
+        if (hasRetained == null || !hasRetained) {
+            setActionBarVisibility(isVisible = true)
+            setProgressBarVisibility(isVisible = true)
+            viewModel.getPaymentsList()
+        }
     }
 
     /** Sets the visibility of progress bar and the remaining components */
@@ -113,12 +119,15 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
         }
     }
 
-    /** Called when an item from payment list is clicked */
+    /** Called when an item from payment list is clicked, navigates to PaymentDetailFragment */
     private fun onPaymentListItemClick(payment: Payment) {
-
+        viewModel.setHasRetainedListState(true)
+        FragmentNavigation().navigateFromHomeToPaymentDetailFragment(payment.id)
     }
 
+    /** Called when the make_payment_button is clicked, navigates to PaymentFragment */
     fun onMakePaymentButtonClick() {
+        viewModel.setHasRetainedListState(true)
         FragmentNavigation().navigateFromHomeToPaymentFragment()
     }
 }

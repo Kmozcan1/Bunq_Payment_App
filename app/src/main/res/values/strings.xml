@@ -29,4 +29,8 @@
     <string name="payment_successful">Payment Successful!</string>
     <string name="payment_error">An error occurred during the payment process</string>
     <string name="cool">Cool!</string>
+    <string name="details">Details</string>
+    <string name="type">Type</string>
+    <string name="sub_type">Sub-Type</string>
+    <string name="payment_details">Payment Details</string>
 </resources>

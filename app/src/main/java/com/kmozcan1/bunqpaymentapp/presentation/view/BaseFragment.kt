@@ -78,7 +78,8 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(viewModelClass)
+        // Create the ViewModel
+        viewModel = ViewModelProvider(this)[viewModelClass]
 
         // LiveData is observed by child classes in this method
         observeLiveData()
@@ -115,6 +116,12 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
         fun navigateFromPaymentToHomeFragment() {
             val navAction = PaymentFragmentDirections
                 .actionPaymentFragmentToHomeFragment()
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
+
+        fun navigateFromHomeToPaymentDetailFragment(paymentId: Int) {
+            val navAction = HomeFragmentDirections
+                .actionHomeFragmentToPaymentDetailFragment(paymentId)
             mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
         }
 
