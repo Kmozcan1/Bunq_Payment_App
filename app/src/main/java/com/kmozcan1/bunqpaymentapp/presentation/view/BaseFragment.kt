@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import com.kmozcan1.bunqpaymentapp.application.BunqPaymentApp
+import com.kmozcan1.bunqpaymentapp.domain.model.Event
 
 /**
  * Created by Kadir Mert Özcan on 27-Nov-21.
@@ -37,6 +39,10 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
     val appCompatActivity: AppCompatActivity by lazy {
         activity as AppCompatActivity
+    }
+
+    val bunqPaymentApp: BunqPaymentApp by lazy {
+        (this.mainActivity.application as BunqPaymentApp)
     }
 
     /** ViewDataBinding instance with the type parameter indicated by the child class */
@@ -99,6 +105,18 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
      * Sets the navigationEvent LiveData of MainViewModel, which is observed from the MainActivity
      */
     protected inner class FragmentNavigation {
+
+        fun navigateFromHomeToPaymentFragment() {
+            val navAction = HomeFragmentDirections
+                .actionHomeFragmentToPaymentFragment()
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
+
+        fun navigateFromPaymentToHomeFragment() {
+            val navAction = PaymentFragmentDirections
+                .actionPaymentFragmentToHomeFragment()
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
 
         fun navigateToBack() {
             navController.popBackStack()

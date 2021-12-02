@@ -14,4 +14,19 @@
     <string name="payment_amount">%1$s %2$s</string>
     <string name="make_payment">Make Payment</string>
     <string name="payments">Payments</string>
+    <string name="receiver_e_mail_address">E-mail</string>
+    <string name="euro_symbol">€</string>
+    <string name="payment_amount_hint">Amount</string>
+    <string name="submit_payment">Submit Payment</string>
+    <string name="payment_description">Description</string>
+    <string name="invalid_amount_warning">Invalid amount</string>
+    <string name="empty_amount_warning">Amount cannot be empty</string>
+    <string name="empty_email_warning">Email cannot be empty</string>
+    <string name="empty_description_warning">Description cannot be empty</string>
+    <string name="payment_processing">Processing...</string>
+    <string name="payment_result">payment result</string>
+    <string name="try_again">Try Again</string>
+    <string name="payment_successful">Payment Successful!</string>
+    <string name="payment_error">An error occurred during the payment process</string>
+    <string name="cool">Cool!</string>
 </resources>

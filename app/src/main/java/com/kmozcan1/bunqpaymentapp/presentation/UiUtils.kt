@@ -1,10 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation
 
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.kmozcan1.bunqpaymentapp.R
 
 /**
  * Created by Kadir Mert Özcan on 28-Nov-21.
