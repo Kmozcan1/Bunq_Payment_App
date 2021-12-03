@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.PaymentListItemBinding
+import java.util.*
 
 /**
  * Created by Kadir Mert Özcan on 28-Nov-21.
@@ -55,7 +56,8 @@ class PaymentListAdapter constructor(
             binding.run {
                 recipientListItemTextView.text = payment.counterpartyAlias.displayName
                 amountListItemTextView.text = root.context.getString(R.string.payment_amount,
-                    payment.amount.value, payment.amount.currency)
+                    payment.amount.value,
+                    Currency.getInstance(payment.amount.currency).symbol)
                 descriptionListItemTextView.text = payment.description
                 root.setOnClickListener{
                     listener(payment)

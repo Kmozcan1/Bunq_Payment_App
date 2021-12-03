@@ -23,7 +23,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
 
     override val isActionBarVisible = false
 
-    var errorState: HomeViewState? = null
+    private var errorState: HomeViewState? = null
 
     // RecyclerView Adapter
     private val paymentListAdapter: PaymentListAdapter by lazy {
@@ -160,5 +160,10 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
                 viewModel.getBunqApiContext()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        binding.paymentListRecyclerView.adapter = null
+        super.onDestroyView()
     }
 }
