@@ -20,12 +20,4 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainViewState>() {
     internal fun setFragmentNavigationEvent(value: Event<NavDirections>) {
         _fragmentNavigationEvent.postValue(value)
     }
-
-    // LiveData for navigation
-    val internetConnectionLiveData: MutableLiveData<Boolean>
-        get() = _internetConnectionLiveData
-    private val _internetConnectionLiveData = MutableLiveData<Boolean>()
-    private fun setInternetConnectionLiveData(value: Boolean) {
-        _internetConnectionLiveData.postValue(value)
-    }
 }

@@ -10,7 +10,6 @@ import com.kmozcan1.bunqpaymentapp.presentation.getFormattedDateTime
 import com.kmozcan1.bunqpaymentapp.presentation.viewmodel.PaymentDetailViewModel
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.PaymentDetailViewState
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint

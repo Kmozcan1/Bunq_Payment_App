@@ -8,13 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import androidx.navigation.NavGraph
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import com.bunq.sdk.context.ApiContext
 import com.google.android.material.appbar.MaterialToolbar
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.ActivityMainBinding
@@ -32,19 +28,12 @@ class MainActivity : AppCompatActivity() {
 
     val viewModel: MainViewModel by viewModels()
 
-    var bunqApiContext: ApiContext? = null
-        private set
-
     private val navHostFragment : NavHostFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
     }
 
     private val navController: NavController by lazy {
         navHostFragment.navController
-    }
-
-    private val navGraph: NavGraph by lazy {
-        navController.navInflater.inflate(R.navigation.nav_graph)
     }
 
     val actionBar: MaterialToolbar by lazy {

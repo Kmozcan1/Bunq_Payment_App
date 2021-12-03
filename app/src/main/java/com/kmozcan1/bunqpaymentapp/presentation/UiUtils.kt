@@ -3,7 +3,6 @@ package com.kmozcan1.bunqpaymentapp.presentation
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,8 +22,12 @@ fun Fragment.hideKeyboard() {
 fun getFormattedDateTime(dateString: String) : String {
     return try {
         val dtf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val formattedDateTime = dtf.parse(dateString)
-        formattedDateTime?.toString() ?: dateString
+        val date = dtf.parse(dateString)
+        if (date != null) {
+            return dtf.format(date).toString()
+        } else {
+            dateString
+        }
     } catch (e: Exception) {
         dateString
     }
