@@ -6,9 +6,11 @@ import androidx.navigation.fragment.navArgs
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.PaymentDetailFragmentBinding
+import com.kmozcan1.bunqpaymentapp.presentation.getFormattedDateTime
 import com.kmozcan1.bunqpaymentapp.presentation.viewmodel.PaymentDetailViewModel
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.PaymentDetailViewState
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
@@ -79,7 +81,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailFragmentBinding, Payment
             paymentDetailAmountTextView.text = getString(R.string.payment_amount,
                 paymentDetail.amount.value,
                 Currency.getInstance(paymentDetail.amount.currency).symbol)
-            paymentDateTextView.text = paymentDetail.updated
+            paymentDateTextView.text = getFormattedDateTime(paymentDetail.updated)
             descriptionDetailTextView.text = paymentDetail.description
             paymentTypeTextView.text = paymentDetail.type
             paymentSubtypeTextView.text = paymentDetail.subType

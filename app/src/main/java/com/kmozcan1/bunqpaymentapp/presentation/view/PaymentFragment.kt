@@ -1,9 +1,12 @@
 package com.kmozcan1.bunqpaymentapp.presentation.view
 
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Observer
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.PaymentFragmentBinding
+import com.kmozcan1.bunqpaymentapp.domain.model.PaymentValidationModel
+import com.kmozcan1.bunqpaymentapp.presentation.hideKeyboard
 import com.kmozcan1.bunqpaymentapp.presentation.viewmodel.PaymentViewModel
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.PaymentViewState
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +25,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
 
     override fun onViewBound() {
         binding.paymentFragment = this
+        setBackPressCallback()
     }
 
     override fun observeLiveData() {
@@ -31,6 +35,20 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
     /** Observes the state of the fragment */
     private fun observeViewState() = Observer<PaymentViewState> { viewState ->
         when (viewState) {
+            is PaymentViewState.PaymentValidation -> {
+                applyPaymentValidation(viewState.paymentValidationResult)
+                // Submit the payment if the fields are valid
+                if (isPaymentValid(viewState.paymentValidationResult)) {
+                    viewModel.submitPayment(
+                        binding.paymentEmailEditText.text.toString(),
+                        binding.paymentAmountEditText.text.toString(),
+                        binding.paymentDescriptionEditText.text.toString()
+                    )
+                } else {
+                    paymentSubmitted = false
+                    binding.submitPaymentButton.isEnabled = true
+                }
+            }
             PaymentViewState.PaymentNetworkError -> {
                 showPaymentResult(isSuccess = false, isNetworkError = true)
             }
@@ -77,19 +95,16 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
      * Calls the viewModel method to make the payment
      * */
     fun onSubmitPaymentButtonClick() {
+        hideKeyboard()
+
         if (!paymentSubmitted) {
             paymentSubmitted = true
             binding.submitPaymentButton.isEnabled = false
-            if (validatePayment()) {
-                viewModel.submitPayment(
-                    binding.paymentEmailEditText.text.toString(),
-                    binding.paymentAmountEditText.text.toString(),
-                    binding.paymentDescriptionEditText.text.toString()
-                )
-            } else {
-                paymentSubmitted = false
-                binding.submitPaymentButton.isEnabled = true
-            }
+            viewModel.validatePayment(
+                binding.paymentEmailEditText.text.toString(),
+                binding.paymentAmountEditText.text.toString(),
+                binding.paymentDescriptionEditText.text.toString()
+            )
         }
     }
 
@@ -113,47 +128,57 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
         FragmentNavigation().navigateFromPaymentToHomeFragment()
     }
 
-    //region Validation
-    /** Validates the fields */
-    private fun validatePayment() : Boolean {
-        var isValid = true
-        val email = binding.paymentEmailEditText.text.toString()
-        val amount = binding.paymentAmountEditText.text.toString()
-        val description = binding.paymentDescriptionEditText.text.toString()
-
-        // Validate email
-        if (email == "") {
-            binding.paymentEmailTextView.error = getString(R.string.empty_email_warning)
-            isValid = false
-        } else {
-            binding.paymentEmailTextView.error = null
-            binding.paymentEmailTextView.isErrorEnabled = false
-        }
-
-        // Validate amount
-        if (amount == "") {
-            binding.paymentAmountTextView.error = getString(R.string.empty_amount_warning)
-            isValid = false
-        } else if (!amount.all { it in '0'..'9' || it == '.' || it == ',' } &&
-            (amount.count { it == '.' } + amount.count { it == ',' } > 1)) {
-            binding.paymentAmountTextView.error = getString(R.string.invalid_amount_warning)
-            isValid = false
-        } else {
-            binding.paymentAmountTextView.error = null
-            binding.paymentAmountTextView.isErrorEnabled = false
-        }
-
-        // Validate description
-        if (description == "") {
-            binding.paymentDescriptionTextView.error = getString(R.string.empty_description_warning)
-            isValid = false
-        } else {
-            binding.paymentDescriptionTextView.error = null
-            binding.paymentDescriptionTextView.isErrorEnabled = false
-        }
-
-        return isValid
+    /** Returns true if all fields are valid, false otherwise*/
+    private fun isPaymentValid(paymentValidationResult: PaymentValidationModel): Boolean {
+        return paymentValidationResult.isAmountValid &&
+                paymentValidationResult.isDescriptionValid &&
+                paymentValidationResult.isEmailValid
     }
-    //endregion
+
+    /** Applies validation results to the fields */
+    private fun applyPaymentValidation(paymentValidationResult: PaymentValidationModel) {
+        paymentValidationResult.let {
+            if (!it.isEmailValid) {
+                binding.paymentEmailTextView.error = it.emailErrorText
+            } else {
+                binding.paymentEmailTextView.error = null
+                binding.paymentEmailTextView.isErrorEnabled = false
+            }
+
+            if (!it.isAmountValid) {
+                binding.paymentAmountTextView.error = it.amountErrorText
+            } else {
+                binding.paymentAmountTextView.error = null
+                binding.paymentAmountTextView.isErrorEnabled = false
+            }
+
+            if (!it.isDescriptionValid) {
+                binding.paymentDescriptionTextView.error = it.descriptionErrorText
+            } else {
+                binding.paymentDescriptionTextView.error = null
+                binding.paymentDescriptionTextView.isErrorEnabled = false
+            }
+        }
+    }
+
+    /**
+     * If payment has failed, pressing the back button will close the layer
+     * but will not navigate to the previous fragment
+     * */
+    private fun setBackPressCallback() {
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner, object : OnBackPressedCallback(true
+            ) {
+            override fun handleOnBackPressed() {
+                if (binding.paymentResultLayout.visibility == View.VISIBLE &&
+                    binding.retryPaymentButton.visibility == View.VISIBLE) {
+                    onRetryPaymentButtonClick()
+                } else {
+                    FragmentNavigation().navigateToBack()
+                }
+            }
+        })
+    }
+
 
 }

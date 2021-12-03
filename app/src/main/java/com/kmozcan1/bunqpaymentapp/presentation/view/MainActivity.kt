@@ -62,19 +62,20 @@ class MainActivity : AppCompatActivity() {
         viewModel.fragmentNavigationEvent.observe(this, observeFragmentNavigation())
     }
 
-    /** Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
-     * While pretty straight-forward for this app, this method allows adding custom
-     * stuff between navigation (like checking for permission) and keeps it all in one place
+    /**
+     * Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
+     * BaseFragment type Fragments can set the fragmentNavigationEvent from MainViewModel
+     * via methods declared in BaseFragment.FragmentNavigation. fragmentNavigationEvent is
+     * an Event type MutableLiveData and is consumed only once.
+     * While this method may feel over-engineered for this project, it is quite useful for
+     * having the navigation logic in one place as well as doing stuff between navigation
+     * where Activity is used, such as asking for permissions.
      */
     private fun observeFragmentNavigation() = Observer<Event<NavDirections>> { navEvent ->
         navEvent.getContentIfNotHandled()?.let { navDirections ->
             when(navDirections.actionId) {
-                R.id.action_homeFragment_to_paymentFragment -> {
-                    navController.navigate(navDirections)
-                }
-                R.id.action_paymentFragment_to_homeFragment -> {
-                    navController.navigate(navDirections)
-                }
+                R.id.action_homeFragment_to_paymentFragment,
+                R.id.action_paymentFragment_to_homeFragment,
                 R.id.action_homeFragment_to_paymentDetailFragment -> {
                     navController.navigate(navDirections)
                 }
@@ -125,11 +126,5 @@ class MainActivity : AppCompatActivity() {
             }
             alertDialog.show()
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
     }
 }
