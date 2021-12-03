@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import com.kmozcan1.bunqpaymentapp.application.BunqPaymentApp
+import com.kmozcan1.bunqpaymentapp.domain.model.Event
 
 /**
  * Created by Kadir Mert Özcan on 27-Nov-21.
@@ -37,6 +39,10 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
     val appCompatActivity: AppCompatActivity by lazy {
         activity as AppCompatActivity
+    }
+
+    val bunqPaymentApp: BunqPaymentApp by lazy {
+        (this.mainActivity.application as BunqPaymentApp)
     }
 
     /** ViewDataBinding instance with the type parameter indicated by the child class */
@@ -72,7 +78,8 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(viewModelClass)
+        // Create the ViewModel
+        viewModel = ViewModelProvider(this)[viewModelClass]
 
         // LiveData is observed by child classes in this method
         observeLiveData()
@@ -90,6 +97,7 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
 
     /** Sets actionBar visibility */
+    @SuppressWarnings("SameParameterValue")
     protected fun setActionBarVisibility(isVisible: Boolean) {
         mainActivity.actionBar.isVisible = isVisible
     }
@@ -100,20 +108,36 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
      */
     protected inner class FragmentNavigation {
 
+        fun navigateFromHomeToPaymentFragment() {
+            val navAction = HomeFragmentDirections
+                .actionHomeFragmentToPaymentFragment()
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
+
+        fun navigateFromPaymentToHomeFragment() {
+            val navAction = PaymentFragmentDirections
+                .actionPaymentFragmentToHomeFragment()
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
+
+        fun navigateFromHomeToPaymentDetailFragment(paymentId: Int) {
+            val navAction = HomeFragmentDirections
+                .actionHomeFragmentToPaymentDetailFragment(paymentId)
+            mainActivity.viewModel.setFragmentNavigationEvent(Event(navAction))
+        }
+
         fun navigateToBack() {
             navController.popBackStack()
         }
     }
 
-    open fun onInternetConnected() {
-        //previouslyDisconnected = false
+    /** This method will be called if an api call has failed due to a network error */
+    protected fun createNetworkErrorDialog() {
+        mainActivity.createNetworkErrorDialog()
     }
 
-    open fun onInternetDisconnected() {
-        //previouslyDisconnected = true
-    }
+    /** Called when the user clicks the "Retry" button in the network error alert dialog */
+    open fun onNetworkErrorDialogRetryButtonClicked() {
 
-    internal fun getIsConnectedToInternet(): Boolean {
-        return mainActivity.isConnectedToInternet
     }
 }

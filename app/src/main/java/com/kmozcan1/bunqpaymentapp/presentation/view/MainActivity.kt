@@ -1,5 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -7,13 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import androidx.navigation.NavGraph
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import com.bunq.sdk.context.ApiContext
 import com.google.android.material.appbar.MaterialToolbar
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.ActivityMainBinding
@@ -29,13 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    var isConnectedToInternet: Boolean = false
-        private set
-
     val viewModel: MainViewModel by viewModels()
-
-    var bunqApiContext: ApiContext? = null
-        private set
 
     private val navHostFragment : NavHostFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -43,10 +34,6 @@ class MainActivity : AppCompatActivity() {
 
     private val navController: NavController by lazy {
         navHostFragment.navController
-    }
-
-    private val navGraph: NavGraph by lazy {
-        navController.navInflater.inflate(R.navigation.nav_graph)
     }
 
     val actionBar: MaterialToolbar by lazy {
@@ -61,37 +48,29 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_BunqPaymentApp)
         super.onCreate(savedInstanceState)
         setViews()
-        viewModel.observeInternetConnection()
-        viewModel.internetConnectionLiveData.observe(this, observeInternetConnection())
         viewModel.fragmentNavigationEvent.observe(this, observeFragmentNavigation())
     }
 
-    /** Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
-     * While pretty straight-forward for this app, this method allows adding custom
-     * stuff between navigation (like checking for permission) and keeps it all in one place
+    /**
+     * Observer method for fragmentNavigationEvent LiveData. Handles fragment navigation.
+     * BaseFragment type Fragments can set the fragmentNavigationEvent from MainViewModel
+     * via methods declared in BaseFragment.FragmentNavigation. fragmentNavigationEvent is
+     * an Event type MutableLiveData and is consumed only once.
+     * While this method may feel over-engineered for this project, it is quite useful for
+     * having the navigation logic in one place as well as doing stuff between navigation
+     * where Activity is used, such as asking for permissions.
      */
     private fun observeFragmentNavigation() = Observer<Event<NavDirections>> { navEvent ->
         navEvent.getContentIfNotHandled()?.let { navDirections ->
             when(navDirections.actionId) {
-
+                R.id.action_homeFragment_to_paymentFragment,
+                R.id.action_paymentFragment_to_homeFragment,
+                R.id.action_homeFragment_to_paymentDetailFragment -> {
+                    navController.navigate(navDirections)
+                }
             }
         }
     }
-
-    /** Observes the internet connectivity */
-    private fun observeInternetConnection() = Observer<Boolean> { connection ->
-        isConnectedToInternet = connection
-        val currentFragment = getActiveFragment()
-        // Handles BaseFragment connection change
-        if (currentFragment is BaseFragment<*, *>) {
-            if (isConnectedToInternet) {
-                currentFragment.onInternetConnected()
-            } else {
-                currentFragment.onInternetDisconnected()
-            }
-        }
-    }
-
 
     /** View related stuff goes here */
     private fun setViews() {
@@ -111,9 +90,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+    /** Called by BaseFragment fragments to display an alert dialog when a network
+     * related error occurs. Clicking the Retry button calls a method that can be
+     * overridden by BaseFragments in order to make the failed api call again */
+    fun createNetworkErrorDialog() {
+        val currentFragment = getActiveFragment()
+        if (currentFragment is BaseFragment<*, *>) {
+            val alertDialog: AlertDialog = this.let {
+                val builder = AlertDialog.Builder(it)
+                builder.apply {
+                    setTitle(getString(R.string.network_error))
+                    setMessage(getString(R.string.network_alert_dialog_message))
+                    setPositiveButton(R.string.retry) { _, _ ->
+                        currentFragment.onNetworkErrorDialogRetryButtonClicked()
+                    }
+                    setNegativeButton(R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    setTheme(R.style.AlertDialogTheme)
+                    setCancelable(false)
+                }
+                // Create the AlertDialog
+                builder.create()
+            }
+            alertDialog.show()
+        }
     }
 }

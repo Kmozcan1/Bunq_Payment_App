@@ -1,20 +1,34 @@
 package com.kmozcan1.bunqpaymentapp.presentation
 
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.kmozcan1.bunqpaymentapp.R
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Kadir Mert Özcan on 28-Nov-21.
  */
 
-// SetAdapter extension for better code readability
-fun RecyclerView.setRecyclerView(
-    layoutManager: RecyclerView.LayoutManager,
-    adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>?
-) {
-    this.layoutManager = layoutManager
-    this.adapter = adapter
+/** Fragment extension to hide the keyboard */
+fun Fragment.hideKeyboard() {
+    if (activity?.currentFocus != null) {
+        val inputMethodManager = context?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
+        inputMethodManager!!.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
+    }
+}
+
+/** Returns formatted date-time */
+fun getFormattedDateTime(dateString: String) : String {
+    return try {
+        val dtf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val date = dtf.parse(dateString)
+        if (date != null) {
+            return dtf.format(date).toString()
+        } else {
+            dateString
+        }
+    } catch (e: Exception) {
+        dateString
+    }
 }

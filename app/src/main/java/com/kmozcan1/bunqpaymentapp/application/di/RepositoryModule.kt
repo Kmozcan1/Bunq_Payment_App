@@ -13,6 +13,6 @@ import dagger.hilt.components.SingletonComponent
 object RepositoryModule {
 
     @Provides
-    fun provideSelfieRepository(sharedPreferencesDataSource: SharedPreferencesDataSource) :
+    fun provideBunqApiRepository(sharedPreferencesDataSource: SharedPreferencesDataSource) :
             BunqApiRepository = BunqApiRepositoryImpl(sharedPreferencesDataSource)
 }

@@ -1,6 +1,7 @@
 package com.kmozcan1.bunqpaymentapp.domain.usecase
 
 import com.kmozcan1.bunqpaymentapp.application.di.IoDispatcher
+import com.kmozcan1.bunqpaymentapp.domain.model.PaymentModel
 import com.kmozcan1.bunqpaymentapp.domain.model.UseCaseResult
 import com.kmozcan1.bunqpaymentapp.domain.repository.BunqApiRepository
 import com.kmozcan1.bunqpaymentapp.domain.usecase.base.FlowUseCase
@@ -13,11 +14,15 @@ import javax.inject.Inject
  *
  * Returns the bunq ApiContext by using BunqApiRepository
  */
-class InitializeBunqApiContextUseCase @Inject constructor(
+class SubmitPaymentUseCase @Inject constructor(
     private val bunqApiRepository: BunqApiRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : FlowUseCase<Unit, Unit>(dispatcher) {
-    override suspend fun execute(parameters: Unit): Flow<UseCaseResult<Unit>> {
-        return bunqApiRepository.initializeBunqApiContext()
+) : FlowUseCase<PaymentModel, Unit>(dispatcher) {
+    override suspend fun execute(parameters: PaymentModel): Flow<UseCaseResult<Unit>> {
+        return bunqApiRepository.submitPayment(
+            email = parameters.email,
+            amount = parameters.amount,
+            description = parameters.description
+        )
     }
 }

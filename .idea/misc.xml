@@ -12,6 +12,11 @@
         <entry key="..\:/Users/darth/AndroidStudioProjects/BunqPaymentApp/app/src/main/res/layout/home_fragment.xml" value="0.22" />
         <entry key="..\:/Users/darth/AndroidStudioProjects/BunqPaymentApp/app/src/main/res/layout/payment_list_item.xml" value="0.28940217391304346" />
         <entry key="..\:/Users/darth/AndroidStudioProjects/BunqPaymentApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3828125" />
+        <entry key="..\:/Users/darth/AndroidStudioProjects/Bunq_Payment_App/app/src/main/res/drawable/layout_border.xml" value="0.22135416666666666" />
+        <entry key="..\:/Users/darth/AndroidStudioProjects/Bunq_Payment_App/app/src/main/res/layout/home_fragment.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/darth/AndroidStudioProjects/Bunq_Payment_App/app/src/main/res/layout/payment_detail_fragment.xml" value="0.25" />
+        <entry key="..\:/Users/darth/AndroidStudioProjects/Bunq_Payment_App/app/src/main/res/layout/payment_fragment.xml" value="0.1" />
+        <entry key="..\:/Users/darth/AndroidStudioProjects/Bunq_Payment_App/app/src/main/res/layout/payment_list_item.xml" value="0.33" />
       </map>
     </option>
   </component>
@@ -20,5 +25,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.20520833333333333" />
+      </ProjectState>
+    </option>
   </component>
 </project>

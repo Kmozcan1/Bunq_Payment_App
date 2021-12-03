@@ -1,22 +1,24 @@
 package com.kmozcan1.bunqpaymentapp.presentation.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.PaymentListItemBinding
+import java.util.*
 
 /**
- * Created by Kadir Mert Özcan on 11/28/2021.
+ * Created by Kadir Mert Özcan on 28-Nov-21.
+ *
+ * PagingDataAdapter class for the payment_list_recycle_view
  */
 class PaymentListAdapter constructor(
-    private val context: Context,
-    private val paymentList: MutableList<Payment>,
     private val listener: (Payment) -> Unit
-) :
-    RecyclerView.Adapter<PaymentListAdapter.PaymentListItemViewHolder>() {
+) : PagingDataAdapter<Payment,
+        PaymentListAdapter.PaymentListItemViewHolder>(PaymentListDiffCallback()) {
 
 
     override fun onCreateViewHolder(
@@ -32,11 +34,18 @@ class PaymentListAdapter constructor(
         holder: PaymentListAdapter.PaymentListItemViewHolder,
         position: Int
     ) {
-        holder.bind(paymentList[position])
+        val payment = getItem(position)
+        payment?.let { holder.bind(it) }
     }
 
-    override fun getItemCount(): Int {
-        return paymentList.size
+    class PaymentListDiffCallback : DiffUtil.ItemCallback<Payment>() {
+        override fun areItemsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+            return oldItem.id == newItem.id
+        }
     }
 
     inner class PaymentListItemViewHolder(
@@ -46,21 +55,14 @@ class PaymentListAdapter constructor(
         fun bind(payment: Payment) {
             binding.run {
                 recipientListItemTextView.text = payment.counterpartyAlias.displayName
-                amountListItemTextView.text = context.getString(R.string.payment_amount,
-                    payment.amount.value, payment.amount.currency)
+                amountListItemTextView.text = root.context.getString(R.string.payment_amount,
+                    payment.amount.value,
+                    Currency.getInstance(payment.amount.currency).symbol)
+                descriptionListItemTextView.text = payment.description
                 root.setOnClickListener{
                     listener(payment)
                 }
             }
         }
     }
-
-    /** Adds a new batch of payments to the RecyclerView */
-    fun addPayments(repositories: List<Payment>) {
-        val startPosition = itemCount
-        paymentList.addAll(repositories)
-        notifyItemRangeInserted(startPosition, paymentList.size)
-    }
-
-
 }

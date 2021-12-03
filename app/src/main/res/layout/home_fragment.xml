@@ -51,16 +51,19 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/payment_list_recycler_view"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/makePaymentButton"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/make_payment_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/payment_list_item" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/homeProgressBar"
+            android:id="@+id/home_progress_bar"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:background="@android:color/transparent"
@@ -72,7 +75,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/makePaymentButton"
+            android:id="@+id/make_payment_button"
             style="@style/TextButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
