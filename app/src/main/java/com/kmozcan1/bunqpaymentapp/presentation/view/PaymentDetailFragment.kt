@@ -33,8 +33,8 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailFragmentBinding, Payment
 
     private fun observeViewState() = Observer<PaymentDetailViewState> { viewState ->
         when (viewState) {
-            PaymentDetailViewState.PaymentDetailError -> {
-
+            PaymentDetailViewState.PaymentDetailNetworkError -> {
+                createNetworkErrorDialog()
             }
             PaymentDetailViewState.PaymentDetailLoading -> {
                 setProgressBarVisibility(true)
@@ -84,6 +84,10 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailFragmentBinding, Payment
             paymentTypeTextView.text = paymentDetail.type
             paymentSubtypeTextView.text = paymentDetail.subType
         }
+    }
+
+    override fun onNetworkErrorDialogRetryButtonClicked() {
+        viewModel.getPaymentDetail(args.paymentId)
     }
 
 }

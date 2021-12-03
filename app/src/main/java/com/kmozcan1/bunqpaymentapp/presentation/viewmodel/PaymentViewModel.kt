@@ -27,7 +27,11 @@ class PaymentViewModel @Inject constructor(
             submitPaymentUseCase(PaymentModel(email, amount, description)).collect { result ->
                 when (result) {
                     is UseCaseResult.Error -> {
-                        setViewState(PaymentViewState.PaymentError)
+                        if (checkIfNetworkError(result.exception)) {
+                            setViewState(PaymentViewState.PaymentNetworkError)
+                        } else {
+                            setViewState(PaymentViewState.PaymentError)
+                        }
                     }
                     UseCaseResult.Loading -> {
                         setViewState(PaymentViewState.PaymentProcessing)

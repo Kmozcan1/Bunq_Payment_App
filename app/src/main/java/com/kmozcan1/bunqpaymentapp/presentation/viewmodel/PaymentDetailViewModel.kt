@@ -20,7 +20,9 @@ class PaymentDetailViewModel @Inject constructor(
             getPaymentUseCase(paymentId).collect { result ->
                 when(result) {
                     is UseCaseResult.Error -> {
-                        setViewState(PaymentDetailViewState.PaymentDetailError)
+                        if (checkIfNetworkError(result.exception)) {
+                            setViewState(PaymentDetailViewState.PaymentDetailNetworkError)
+                        }
                     }
                     UseCaseResult.Loading -> {
                         setViewState(PaymentDetailViewState.PaymentDetailLoading)

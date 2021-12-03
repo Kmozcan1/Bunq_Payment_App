@@ -3,6 +3,7 @@ package com.kmozcan1.bunqpaymentapp.presentation.view
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.kmozcan1.bunqpaymentapp.R
 import com.kmozcan1.bunqpaymentapp.databinding.HomeFragmentBinding
@@ -21,6 +22,8 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
     override val viewModelClass: Class<HomeViewModel> = HomeViewModel::class.java
 
     override val isActionBarVisible = false
+
+    var errorState: HomeViewState? = null
 
     // RecyclerView Adapter
     private val paymentListAdapter: PaymentListAdapter by lazy {
@@ -48,9 +51,13 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
     /** Observes HomeViewState */
     private fun observeViewState() = Observer<HomeViewState> { viewState ->
         when (viewState) {
-            is HomeViewState.BunqApiContext -> {
+            is HomeViewState.BunqApiContextSuccess -> {
                 bunqPaymentApp.isApiContextInitialized = true
                 displayPayments()
+            }
+            is HomeViewState.BunqApiContextNetworkError -> {
+                errorState = HomeViewState.BunqApiContextNetworkError
+                createNetworkErrorDialog()
             }
             is HomeViewState.PaymentList -> {
                 viewModel.getHasRetainedListState()?.let {
@@ -79,6 +86,17 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
                 }
             }
         }
+
+        paymentListAdapter.addLoadStateListener { loadState ->
+            if (loadState.prepend is LoadState.Error ||
+                loadState.append is LoadState.Error ||
+                loadState.refresh is LoadState.Error) {
+                    errorState = HomeViewState.PaymentListNetworkError
+                    createNetworkErrorDialog()
+            }
+
+        }
+
         binding.paymentListRecyclerView.adapter = paymentListAdapter
     }
 
@@ -129,5 +147,18 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
     fun onMakePaymentButtonClick() {
         viewModel.setHasRetainedListState(true)
         FragmentNavigation().navigateFromHomeToPaymentFragment()
+    }
+
+    override fun onNetworkErrorDialogRetryButtonClicked() {
+        errorState?.let { errorState ->
+            if (errorState is HomeViewState.PaymentListNetworkError) {
+                viewModel.run {
+                    setHasRetainedListState(false)
+                    getPaymentsList()
+                }
+            } else if (errorState is HomeViewState.BunqApiContextNetworkError) {
+                viewModel.getBunqApiContext()
+            }
+        }
     }
 }

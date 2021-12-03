@@ -40,31 +40,37 @@ class BunqApiRepositoryImpl @Inject constructor(
 
     /** Retrieves the ApiContext from SharedPrefs if it has been initialized before,
      * otherwise creates the ApiContext and save it to the SharedPrefs */
-    override fun initializeBunqApiContext() {
-        try {
-            val apiContextPref = sharedPreferencesDataSource.getApiContextPref()
+    override fun initializeBunqApiContext(): Flow<UseCaseResult<Unit>> {
+        return flow {
+            try {
+                emit(UseCaseResult.Loading)
+                val apiContextPref = sharedPreferencesDataSource.getApiContextPref()
 
-            if (apiContextPref != null) {
-                // return the existing ApiContext from shared prefs
-                ApiContext.fromJson(sharedPreferencesDataSource.getApiContextPref()).apply {
-                    ensureSessionActive()
-                }.also { apiContext ->
-                    BunqContext.loadApiContext(apiContext)
+                if (apiContextPref != null) {
+                    // return the existing ApiContext from shared prefs
+                    ApiContext.fromJson(sharedPreferencesDataSource.getApiContextPref()).apply {
+                        ensureSessionActive()
+                    }.also { apiContext ->
+                        BunqContext.loadApiContext(apiContext)
+                    }
+                } else {
+                    // create the ApiContext
+                    ApiContext.create(ENVIRONMENT_TYPE, API_KEY, DEVICE_DESCRIPTION).apply {
+                        ensureSessionActive()
+                    }.also { apiContext ->
+                        // share ApiContext to saved prefs before returning it
+                        sharedPreferencesDataSource.setApiContextPref(apiContext.toJson())
+                        BunqContext.loadApiContext(apiContext)
+                    }
                 }
-            } else {
-                // create the ApiContext
-                ApiContext.create(ENVIRONMENT_TYPE, API_KEY, DEVICE_DESCRIPTION).apply {
-                    ensureSessionActive()
-                }.also { apiContext ->
-                    // share ApiContext to saved prefs before returning it
-                    sharedPreferencesDataSource.setApiContextPref(apiContext.toJson())
-                    BunqContext.loadApiContext(apiContext)
-                }
+                emit(UseCaseResult.Success(Unit))
+            } catch (e: UncaughtExceptionError) {
+                Timber.e(e)
+                emit(UseCaseResult.Error(e))
+            } catch (e: java.lang.Exception) {
+                Timber.e(e)
+                emit(UseCaseResult.Error(e))
             }
-        } catch (e: UncaughtExceptionError) {
-            Timber.e(e)
-        } catch (e: java.lang.Exception) {
-            Timber.e(e)
         }
     }
 

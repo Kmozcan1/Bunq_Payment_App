@@ -7,4 +7,5 @@ sealed class PaymentViewState {
     object PaymentProcessing : PaymentViewState()
     object PaymentSuccessful : PaymentViewState()
     object PaymentError : PaymentViewState()
+    object PaymentNetworkError : PaymentViewState()
 }

@@ -1,5 +1,6 @@
 package com.kmozcan1.bunqpaymentapp.presentation.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,9 +29,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    var isConnectedToInternet: Boolean = false
-        private set
 
     val viewModel: MainViewModel by viewModels()
 
@@ -61,8 +59,6 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_BunqPaymentApp)
         super.onCreate(savedInstanceState)
         setViews()
-        viewModel.observeInternetConnection()
-        viewModel.internetConnectionLiveData.observe(this, observeInternetConnection())
         viewModel.fragmentNavigationEvent.observe(this, observeFragmentNavigation())
     }
 
@@ -86,21 +82,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Observes the internet connectivity */
-    private fun observeInternetConnection() = Observer<Boolean> { connection ->
-        isConnectedToInternet = connection
-        val currentFragment = getActiveFragment()
-        // Handles BaseFragment connection change
-        if (currentFragment is BaseFragment<*, *>) {
-            if (isConnectedToInternet) {
-                currentFragment.onInternetConnected()
-            } else {
-                currentFragment.onInternetDisconnected()
-            }
-        }
-    }
-
-
     /** View related stuff goes here */
     private fun setViews() {
         // view binding
@@ -116,6 +97,33 @@ class MainActivity : AppCompatActivity() {
         } else {
             supportFragmentManager.fragments
                 .first()?.childFragmentManager?.fragments?.get(0)
+        }
+    }
+
+    /** Called by BaseFragment fragments to display an alert dialog when a network
+     * related error occurs. Clicking the Retry button calls a method that can be
+     * overridden by BaseFragments in order to make the failed api call again */
+    fun createNetworkErrorDialog() {
+        val currentFragment = getActiveFragment()
+        if (currentFragment is BaseFragment<*, *>) {
+            val alertDialog: AlertDialog = this.let {
+                val builder = AlertDialog.Builder(it)
+                builder.apply {
+                    setTitle(getString(R.string.network_error))
+                    setMessage(getString(R.string.network_alert_dialog_message))
+                    setPositiveButton(R.string.retry) { _, _ ->
+                        currentFragment.onNetworkErrorDialogRetryButtonClicked()
+                    }
+                    setNegativeButton(R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    setTheme(R.style.AlertDialogTheme)
+                    setCancelable(false)
+                }
+                // Create the AlertDialog
+                builder.create()
+            }
+            alertDialog.show()
         }
     }
 
