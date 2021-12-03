@@ -31,6 +31,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
     /** Observes the state of the fragment */
     private fun observeViewState() = Observer<PaymentViewState> { viewState ->
         when (viewState) {
+            PaymentViewState.PaymentNetworkError -> {
+                showPaymentResult(isSuccess = false, isNetworkError = true)
+            }
             PaymentViewState.PaymentError -> {
                 showPaymentResult(isSuccess = false)
             }
@@ -44,7 +47,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
     }
 
     /** Shows the payment_result_layout after its contents depending on the result */
-    private fun showPaymentResult(isSuccess: Boolean) {
+    private fun showPaymentResult(isSuccess: Boolean, isNetworkError: Boolean = false) {
         if (isSuccess) {
             binding.run {
                 paymentResultImageView.setImageResource(R.drawable.ic_baseline_check_circle_24)
@@ -55,7 +58,12 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
         } else {
             binding.run {
                 paymentResultImageView.setImageResource(R.drawable.ic_baseline_error_24)
-                paymentResultTextView.text = getString(R.string.payment_error)
+                if (isNetworkError) {
+                    paymentResultTextView.text = getString(R.string.network_alert_dialog_message)
+                } else {
+                    paymentResultTextView.text = getString(R.string.payment_error)
+                }
+
                 navigateToPaymentListButton.visibility = View.GONE
                 retryPaymentButton.visibility = View.VISIBLE
             }
@@ -78,6 +86,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding, PaymentViewModel>()
                     binding.paymentAmountEditText.text.toString(),
                     binding.paymentDescriptionEditText.text.toString()
                 )
+            } else {
+                paymentSubmitted = false
+                binding.submitPaymentButton.isEnabled = true
             }
         }
     }

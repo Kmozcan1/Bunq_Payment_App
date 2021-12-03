@@ -97,6 +97,7 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
 
 
     /** Sets actionBar visibility */
+    @SuppressWarnings("SameParameterValue")
     protected fun setActionBarVisibility(isVisible: Boolean) {
         mainActivity.actionBar.isVisible = isVisible
     }
@@ -130,15 +131,13 @@ abstract class BaseFragment<DataBindingClass : ViewDataBinding, ViewModelClass :
         }
     }
 
-    open fun onInternetConnected() {
-        //previouslyDisconnected = false
+    /** This method will be called if an api call has failed due to a network error */
+    protected fun createNetworkErrorDialog() {
+        mainActivity.createNetworkErrorDialog()
     }
 
-    open fun onInternetDisconnected() {
-        //previouslyDisconnected = true
-    }
+    /** Called when the user clicks the "Retry" button in the network error alert dialog */
+    open fun onNetworkErrorDialogRetryButtonClicked() {
 
-    internal fun getIsConnectedToInternet(): Boolean {
-        return mainActivity.isConnectedToInternet
     }
 }

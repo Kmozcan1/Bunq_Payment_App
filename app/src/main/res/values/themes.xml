@@ -21,6 +21,7 @@
 
         <item name="colorAccent">@color/white</item>
 
+        <item name="android:navigationBarColor">@color/black</item>
 
         <!-- textView style -->
         <item name="android:textViewStyle">@style/TextViewStyle</item>

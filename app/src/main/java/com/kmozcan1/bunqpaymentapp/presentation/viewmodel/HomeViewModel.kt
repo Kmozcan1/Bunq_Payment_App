@@ -11,6 +11,7 @@ import com.kmozcan1.bunqpaymentapp.domain.usecase.InitializeBunqApiContextUseCas
 import com.kmozcan1.bunqpaymentapp.presentation.pagingsource.PaymentListPagingSource
 import com.kmozcan1.bunqpaymentapp.presentation.viewstate.HomeViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,9 +33,20 @@ class HomeViewModel @Inject constructor(
     /** Retrieves the bunq ApiContext using the GetBunqApiContextUseCase Interactor */
     fun getBunqApiContext() {
         viewModelScope.launch {
-            val result = initializeBunqApiContextUseCase(Unit)
-            if (result is UseCaseResult.Success) {
-                setViewState(HomeViewState.BunqApiContext)
+            initializeBunqApiContextUseCase(Unit).collect { result ->
+                when(result) {
+                    is UseCaseResult.Error -> {
+                         if (checkIfNetworkError(result.exception)) {
+                             setViewState(HomeViewState.BunqApiContextNetworkError)
+                         }
+                    }
+                    UseCaseResult.Loading -> {
+                        setViewState(HomeViewState.BunqApiContextLoading)
+                    }
+                    is UseCaseResult.Success -> {
+                        setViewState(HomeViewState.BunqApiContextSuccess)
+                    }
+                }
 
             }
         }
