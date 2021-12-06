@@ -104,9 +104,9 @@ class HomeFragment : BaseFragment<HomeFragmentBinding, HomeViewModel>() {
         val hasRetained = viewModel.getHasRetainedListState()
 
         setInitializationLayoutVisibility(isVisible = false)
+        setActionBarVisibility(isVisible = true)
 
         if (hasRetained == null || !hasRetained) {
-            setActionBarVisibility(isVisible = true)
             setProgressBarVisibility(isVisible = true)
             viewModel.getPaymentsList()
         }
